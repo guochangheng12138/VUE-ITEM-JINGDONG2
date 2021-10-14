@@ -56,7 +56,9 @@
 
     <div class="wrapper_under">
       <div class="wrapper_under_money">实付金额：&yen;{{ price }}</div>
-      <div class="wrapper_under_sub">提交订单</div>
+      <div class="wrapper_under_sub" @click="handleProductsSubmit">
+        提交订单
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +68,7 @@ import AddressSelect from "./AddressSelect";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { computed } from "vue";
+import request from "../../utils/request";
 
 const useProductListEffect = () => {
   const route = useRoute();
@@ -78,12 +81,15 @@ const useProductListEffect = () => {
   const productItemTotoal = computed(() => {
     const productlist = cartList[shopId].pId;
     if (productlist) {
+      const products = []; // 订单商品列表
       for (let i in productlist) {
-        const product = productlist[i];
-        product.total = product.count * product.price;
+        const productIT = productlist[i];
+        productIT.total = productIT.count * productIT.price;
+        // 订单商品列表
+        products.push({ id: parseInt(productIT.id, 10), num: productIT.count });
       }
+      localStorage.products = JSON.stringify(products);
     }
-    // console.log(productlist);
     return productlist;
   });
   // 全部订单商品总价格
@@ -100,6 +106,36 @@ const useProductListEffect = () => {
   });
 
   return { productItemTotoal, price };
+};
+// 订单提交逻辑
+const useProductsConfirmSubmitEffect = () => {
+  const route = useRoute();
+  const router = useRouter();
+
+  const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
+  const DefaultAddressId = JSON.parse(localStorage.getItem("DefaultAddressId"));
+  const shopId = Number(route.params.id);
+  const shopName = route.query.plan;
+  const products = JSON.parse(localStorage.getItem("products"));
+
+  const handleProductsSubmit = async () => {
+    try {
+      const result = await request.post("/api/v1/create/", {
+        id: userinfo.id,
+        addressId: DefaultAddressId,
+        shopId: shopId,
+        shopName: shopName,
+        products: JSON.stringify(products),
+      });
+      if (result.msg == "ok") {
+        router.push({ name: "OrderList" });
+      }
+    } catch (e) {
+      console.log("提交订单失败");
+    }
+  };
+
+  return { handleProductsSubmit };
 };
 
 // 返回按钮
@@ -121,11 +157,14 @@ export default {
     const shopTitle = route.query.plan;
     const { handleBackClick } = useBackRouterEffect();
     const { productItemTotoal, price } = useProductListEffect();
+    const { handleProductsSubmit } = useProductsConfirmSubmitEffect();
     return {
       handleBackClick,
       shopTitle,
       productItemTotoal,
       price,
+
+      handleProductsSubmit,
     };
   },
 };

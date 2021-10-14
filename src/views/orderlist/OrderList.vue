@@ -42,7 +42,9 @@ import Docker from "../home/Docker.vue";
 
 import { computed } from "vue";
 import { useStore } from "vuex";
+import request from "../../utils/request";
 
+// 本地购物车请求逻辑
 const useCartEffect = () => {
   const store = useStore();
   const cartList = store.state.cartList;
@@ -74,12 +76,41 @@ const useCartEffect = () => {
   };
 };
 
+// 用户在线订单请求逻辑
+// const userOrderList = ref({});
+const userOrderList = {};
+const usegetOrderListEffect = () => {
+  const getOrderList = async () => {
+    const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
+    const result = await request.get("/api/v1/orders/" + userinfo.id);
+    if (result.msg == "ok") {
+      userOrderList.value = result.data;
+
+      console.log(result.data[1]);
+      console.log(userOrderList.value[1]);
+
+      console.log(userOrderList);
+      console.log(result.data);
+      // console.log(typeof result.data);
+      // console.log(result.data[1].products);
+      // console.log(typeof userOrderList);
+      // localStorage.setItem("useraddress", JSON.stringify(result.data));
+    } else {
+      // localStorage.setItem("useraddress", {});
+      console.log("订单不存在");
+    }
+  };
+  return { getOrderList };
+};
+
 export default {
   name: "OrderList",
   components: { Docker },
 
   setup() {
     const { productListall } = useCartEffect();
+    const { getOrderList } = usegetOrderListEffect();
+    getOrderList();
     return {
       productListall,
     };
