@@ -10,12 +10,6 @@
       </div>
     </div>
     <div class="wrapper_my">我的收货地址</div>
-    <!-- <router-link
-      :to="{ path: `/editingaddress/${index}`, query: { plan: `${item.id}` } }"
-      class="wrapper_content"
-      v-for="(item, index) in userAddressList"
-      :key="index"
-    > -->
     <div
       class="wrapper_content"
       v-for="(item, index) in userAddressList"
@@ -34,16 +28,17 @@
         </div>
       </div>
       <div class="wrapper_content_go">
+        <!-- ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！ -->
+        <!-- @click.stop与<div 含点击事件连用>,@click.prevent与<router-link to>连用 -->
+        <!-- ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！ -->
         <div
           class="wrapper_content_go_delete iconfont"
-          @click.prevent="handleAddressDeleteClick(`${item.id}`)"
+          @click.stop="handleAddressDeleteClick(`${item.id}`)"
         >
           &#xe8c1;
         </div>
-        <!-- <div class="wrapper_content_go_delete iconfont"></div> -->
         <div class="wrapper_content_go_in">></div>
       </div>
-      <!-- </router-link> -->
     </div>
   </div>
 </template>
@@ -65,7 +60,11 @@ const useAddressBuildEffect = () => {
 const useBackRouterEffect = () => {
   const router = useRouter();
   const handleBackClick = () => {
-    router.push({ name: "Person" });
+    if (localStorage.AddressSelect == "false") {
+      router.back();
+    } else {
+      router.push({ name: "Person" });
+    }
   };
   return { handleBackClick };
 };
@@ -83,8 +82,8 @@ const useAddressListEffect = () => {
       userAddressList.value = result.data;
       localStorage.setItem("useraddress", JSON.stringify(result.data));
     } else {
-      console.log("地址不存在");
       localStorage.setItem("useraddress", {});
+      console.log("地址不存在");
     }
   };
   // 用户地址删除逻辑
@@ -97,33 +96,34 @@ const useAddressListEffect = () => {
         location.reload();
       }
     } catch (e) {
-      console.log("请求失败");
+      console.log(e);
+      console.log("删除地址失败");
     }
   };
   // 用户地址编辑或设置默认地址逻辑
   const handleAddressEditeClick = async (index, indexId) => {
-    if (localStorage.AddressSelect) {
+    if (localStorage.AddressSelect == "true") {
       router.push({
         path: `/editingaddress/${index}`,
         query: { plan: indexId },
       });
-      console.log(indexId);
     } else {
       try {
-        // console.log(localStorage.AddressSelect);
-        // const result = await request.post(
-        //   "/api/v1/updateAddress/" + userinfo.id,
-        //   {
-        //     id: indexId,
-        //     is_default: 1,
-        //   }
-        // );
-        // if (result.msg == "ok") {
-        //   localStorage.isDefaultAddress = true;
-        //   router.back();
-        // }
+        const result = await request.post(
+          "/api/v1/updateAddress/" + userinfo.id,
+          {
+            id: indexId,
+            is_default: 1,
+          }
+        );
+        if (result.msg == "ok") {
+          localStorage.isDefaultAddress = true;
+          localStorage.DefaultAddressId = indexId;
+          router.back();
+        }
       } catch (e) {
-        console.log("请求失败");
+        console.log(e);
+        console.log("提交默认地址失败");
       }
     }
   };
