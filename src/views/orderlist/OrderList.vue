@@ -92,7 +92,7 @@ const usegetOrderListEffect = () => {
       console.log(userOrderList);
       console.log(result.data);
       console.log(typeof result.data);
-      // console.log(result.data[1].products);
+      console.log(result.data[1].products);
       // console.log(typeof userOrderList);
       // localStorage.setItem("useraddress", JSON.stringify(result.data));
     } else {
