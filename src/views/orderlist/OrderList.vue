@@ -3,7 +3,7 @@
     <div class="wrapper_title">我的订单</div>
     <div
       v-for="(items, index) in userOrderLists"
-      :key="items.id"
+      :key="index"
       v-show="items.count != 0"
       class="gouwuche_content"
     >
@@ -11,7 +11,7 @@
         <div class="gouwuche_content_font_shoptitle">{{ items.shop_name }}</div>
         <div
           class="gouwuche_content_font_pay"
-          @click="handleOrderlistSubmit(index)"
+          @click="handleOrderlistSubmit(items.shop_id, items.shop_name, index)"
         >
           {{ items.order_status }}
         </div>
@@ -117,10 +117,10 @@ const usegetOrderListEffect = () => {
 // 未支付跳转逻辑
 const userOrderListsSubmitEffect = () => {
   const router = useRouter();
-  const handleOrderlistSubmit = (index) => {
+  const handleOrderlistSubmit = (shopId, shopTitle, index) => {
     router.push({
-      path: `/orderlistconfirm/${index}`,
-      // query: { plan: `${shopTitle}` },
+      path: `/orderlistconfirm/${shopId}`,
+      query: { plan: `${shopTitle}`, index: `${index}` },
     });
     // 设置进入订单确认界面，点击每个订单后的跳转校验参数
     localStorage.OrderListsubmit = true;

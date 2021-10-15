@@ -89,8 +89,13 @@
         <div class="check_info">
           总计：<span class="check_info_price">&yen;{{ price }}</span>
         </div>
-        <!-- <div class="check_btn">去结算</div> -->
-        <router-link
+        <div
+          class="check_btn"
+          @click="handleOrderlistSubmit(shopId, shopTitle)"
+        >
+          去结算
+        </div>
+        <!-- <router-link
           class="check_btn"
           :to="{
             path: `/orderlistconfirm/${shopId}`,
@@ -98,7 +103,7 @@
           }"
         >
           去结算
-        </router-link>
+        </router-link> -->
       </div>
     </div>
   </div>
@@ -108,6 +113,7 @@
 import { computed, ref } from "vue";
 
 // import { computed } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 
@@ -115,6 +121,8 @@ import { useCommonCartEffect } from "./CommonCartEffect";
 
 // const useCartEffect = () => {
 const useCartEffect = (shopId) => {
+  const router = useRouter();
+
   const store = useStore();
   // const route = useRoute();
   // const shopId = route.params.id;
@@ -188,6 +196,16 @@ const useCartEffect = (shopId) => {
     store.commit("setCartItemsChecked", { shopId });
   };
 
+  // 结算跳转逻辑
+  const handleOrderlistSubmit = (shopId, shopTitle) => {
+    router.push({
+      path: `/orderlistconfirm/${shopId}`,
+      query: { plan: `${shopTitle}` },
+    });
+    // 设置进入订单确认界面前的跳转校验参数
+    localStorage.OrderListsubmit = false;
+  };
+
   // return { total, price };
   return {
     total,
@@ -202,6 +220,7 @@ const useCartEffect = (shopId) => {
     allChecked,
     setCartItemsChecked,
     // shopTitle,
+    handleOrderlistSubmit,
   };
 };
 
@@ -235,6 +254,8 @@ export default {
 
       allChecked,
       setCartItemsChecked,
+
+      handleOrderlistSubmit,
     } = useCartEffect(shopId);
 
     const { showCart, handleCartShowChange } = toggleCartEffect();
@@ -252,6 +273,8 @@ export default {
 
       allChecked,
       setCartItemsChecked,
+
+      handleOrderlistSubmit,
 
       showCart,
       handleCartShowChange,

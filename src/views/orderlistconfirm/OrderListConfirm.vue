@@ -23,7 +23,7 @@
 
           <div
             class="wrapper_content_productlist_item"
-            v-for="(item, index) in productItemTotoal"
+            v-for="(item, index) in productlist.value"
             :key="index"
             v-show="item.count != 0"
           >
@@ -55,7 +55,7 @@
       </div>
 
       <div class="wrapper_under">
-        <div class="wrapper_under_money">实付金额：&yen;{{ price }}</div>
+        <div class="wrapper_under_money">实付金额：&yen;{{ count }}</div>
         <div class="wrapper_under_sub" @click="handleProductsSubmit">
           提交订单
         </div>
@@ -69,47 +69,78 @@ import AddressSelect from "./AddressSelect";
 
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { computed } from "vue";
 import request from "../../utils/request";
 import { ref } from "vue";
 
 const useProductListEffect = () => {
   const route = useRoute();
-  const store = useStore();
-
   const shopId = route.params.id;
-  const cartList = store.state.cartList;
-  // const cartList = JSON.parse(localStorage.getItem("carList"));
+
+  const cartList = JSON.parse(localStorage.getItem("carList"));
+  const OrderList = JSON.parse(localStorage.getItem("userOrderLists"));
 
   // 单个商品总价格
-  const productItemTotoal = computed(() => {
-    const productlist = cartList[shopId].pId;
-    if (productlist) {
-      const products = []; // 订单商品列表
-      for (let i in productlist) {
-        const productIT = productlist[i];
-        productIT.total = productIT.count * productIT.price;
-        // 订单商品列表
-        products.push({ id: parseInt(productIT.id, 10), num: productIT.count });
+  const productlist = {};
+  const productItemTotoal = () => {
+    if (localStorage.OrderListsubmit !== "true") {
+      productlist.value = cartList[shopId].pId;
+      if (productlist.value) {
+        const products = []; // 订单商品列表
+        for (let i in productlist.value) {
+          const productIT = productlist.value[i];
+          productIT.total = productIT.count * productIT.price;
+          // 订单商品列表
+          if (productIT.count !== 0) {
+            products.push({
+              id: parseInt(productIT.id, 10),
+              num: productIT.count,
+            });
+          }
+        }
+        localStorage.products = JSON.stringify(products);
       }
-      localStorage.products = JSON.stringify(products);
+    } else {
+      const index = route.query.index;
+      productlist.value = OrderList[index].products;
+      if (productlist.value) {
+        const products = []; // 订单商品列表
+        for (let i in productlist.value) {
+          const productIT = productlist.value[i];
+          productIT.total = productIT.count * productIT.price;
+          // 订单商品列表
+          products.push({
+            id: parseInt(productIT.id, 10),
+            num: productIT.count,
+          });
+        }
+        localStorage.products = JSON.stringify(products);
+      }
     }
-    return productlist;
-  });
+  };
   // 全部订单商品总价格
-  const price = computed(() => {
-    const productlist = cartList[shopId].pId;
-    let count = 0;
-    if (productlist) {
-      for (let i in productlist) {
-        const product = productlist[i];
-        count += product.count * product.price;
+  let count = ref(0);
+  const price = () => {
+    if (localStorage.OrderListsubmit !== "true") {
+      productlist.value = cartList[shopId].pId;
+      if (productlist.value) {
+        for (let i in productlist.value) {
+          const product = productlist.value[i];
+          count.value += product.count * product.price;
+        }
+      }
+    } else {
+      const index = route.query.index;
+      productlist.value = OrderList[index].products;
+      if (productlist.value) {
+        for (let i in productlist.value) {
+          const product = productlist.value[i];
+          count.value += product.count * product.price;
+        }
       }
     }
-    return count.toFixed(2);
-  });
+  };
 
-  return { productItemTotoal, price };
+  return { productItemTotoal, productlist, price, count };
 };
 // 订单提交逻辑
 const useProductsConfirmSubmitEffect = () => {
@@ -172,8 +203,12 @@ export default {
   setup() {
     const route = useRoute();
     const shopTitle = route.query.plan;
+
     const { handleBackClick } = useBackRouterEffect();
-    const { productItemTotoal, price } = useProductListEffect();
+    const { productItemTotoal, price, productlist, count } =
+      useProductListEffect();
+    productItemTotoal();
+    price();
     const { handleProductsSubmit, showPopup, handleToastShutdown } =
       useProductsConfirmSubmitEffect();
 
@@ -181,7 +216,9 @@ export default {
       handleBackClick,
       shopTitle,
       productItemTotoal,
+      productlist,
       price,
+      count,
 
       handleProductsSubmit,
       showPopup,

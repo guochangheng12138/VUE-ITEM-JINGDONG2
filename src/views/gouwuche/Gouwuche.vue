@@ -46,7 +46,7 @@
             {{ items.counts }}元
           </div>
         </div>
-        <router-link
+        <!-- <router-link
           class="gouwuche_content_zongji_font"
           :to="{
             path: `/orderlistconfirm/${index}`,
@@ -54,8 +54,13 @@
           }"
         >
           去结算
-        </router-link>
-        <!-- <div class="gouwuche_content_zongji_font">去结算</div> -->
+        </router-link> -->
+        <div
+          class="gouwuche_content_zongji_font"
+          @click="handleOrderlistSubmit(index, items.title)"
+        >
+          去结算
+        </div>
       </div>
     </div>
   </div>
@@ -65,10 +70,13 @@
 <script>
 import { computed } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 import Docker from "../home/Docker.vue";
 
 const useCartEffect = () => {
+  const router = useRouter();
+
   const store = useStore();
   const cartList = store.state.cartList;
 
@@ -115,10 +123,20 @@ const useCartEffect = () => {
     // return {num};
     // 此处返回带{}的num,渲染层数据使用{{qsum.num}},返回多个数据必须用打点
   });
+  // 结算跳转逻辑
+  const handleOrderlistSubmit = (index, shopTitle) => {
+    router.push({
+      path: `/orderlistconfirm/${index}`,
+      query: { plan: `${shopTitle}` },
+    });
+    // 设置进入订单确认界面前的跳转校验参数
+    localStorage.OrderListsubmit = false;
+  };
 
   return {
     productListall,
     qsum,
+    handleOrderlistSubmit,
   };
 };
 
@@ -127,10 +145,11 @@ export default {
   components: { Docker },
 
   setup() {
-    const { productListall, qsum } = useCartEffect();
+    const { productListall, qsum, handleOrderlistSubmit } = useCartEffect();
     return {
       productListall,
       qsum,
+      handleOrderlistSubmit,
     };
   },
 };
