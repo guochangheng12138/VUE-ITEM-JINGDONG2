@@ -57,6 +57,7 @@ export default createStore({
 
     //   setLocalCarList(state)
     // },
+    // 点击添加或减少商品数量
     changeCartItemInfo(state, payload) {
       const { shopId, shopTitle, productId, productInfo, num } = payload;
       let shopInfo = state.cartList[shopId];
@@ -78,7 +79,7 @@ export default createStore({
 
       setLocalCarList(state)
     },
-
+    // 改变选中状态
     changeCartItemChecked(state, payload) {
       const { shopId, productId } = payload;
       // const product = state.cartList[shopId][productId];
@@ -87,7 +88,7 @@ export default createStore({
 
       setLocalCarList(state)
     },
-
+    // 清空购物车
     clearCartProducts(state, payload) {
       const { shopId } = payload;
       // state.cartList[shopId] = {};
@@ -95,7 +96,7 @@ export default createStore({
 
       setLocalCarList(state)
     },
-
+    // 购物车全选功能
     setCartItemsChecked(state, payload) {
       const { shopId } = payload;
       // const products = state.cartList[shopId];

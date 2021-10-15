@@ -1,46 +1,57 @@
 <template>
-  <div class="wrapper">
-    <div class="wrapper_title">
-      <div class="wrapper_title_icon iconfont" @click="handleBackClick">
-        &#xe612;
-      </div>
-      <div class="wrapper_title_font">确认订单</div>
+  <div>
+    <div class="mask" v-if="showPopup"></div>
+    <div class="showPopup iconfont" v-if="showPopup">
+      <div class="showPopup_gg" @click="handleToastShutdown">&#xe604;</div>
+      <div class="showPopup_rr">&#xe62f;</div>
+      <div class="showPopup_font">支付成功,等待配送</div>
     </div>
-    <div class="wrapper_content">
-      <AddressSelect />
+    <div class="wrapper">
+      <div class="wrapper_title">
+        <div class="wrapper_title_icon iconfont" @click="handleBackClick">
+          &#xe612;
+        </div>
+        <div class="wrapper_title_font">确认订单</div>
+      </div>
+      <div class="wrapper_content">
+        <AddressSelect />
 
-      <div class="wrapper_content_productlist">
-        <div class="wrapper_content_productlist_shoptitle">{{ shopTitle }}</div>
+        <div class="wrapper_content_productlist">
+          <div class="wrapper_content_productlist_shoptitle">
+            {{ shopTitle }}
+          </div>
 
-        <div
-          class="wrapper_content_productlist_item"
-          v-for="(item, index) in productItemTotoal"
-          :key="index"
-        >
-          <img
-            class="wrapper_content_productlist_item_img"
-            :src="item.img_url"
-          />
-          <div class="wrapper_content_productlist_item_flex">
-            <div class="wrapper_content_productlist_item_flex_name22price">
-              <div
-                class="wrapper_content_productlist_item_flex_name22price_name"
-              >
-                {{ item.name }}
+          <div
+            class="wrapper_content_productlist_item"
+            v-for="(item, index) in productItemTotoal"
+            :key="index"
+          >
+            <img
+              class="wrapper_content_productlist_item_img"
+              :src="item.img_url"
+            />
+            <div class="wrapper_content_productlist_item_flex">
+              <div class="wrapper_content_productlist_item_flex_name22price">
+                <div
+                  class="wrapper_content_productlist_item_flex_name22price_name"
+                >
+                  {{ item.name }}
+                </div>
+                <div
+                  class="
+                    wrapper_content_productlist_item_flex_name22price_price
+                  "
+                >
+                  &yen;{{ item.price }}&nbsp;x&nbsp;{{ item.count }}
+                </div>
               </div>
-              <div
-                class="wrapper_content_productlist_item_flex_name22price_price"
-              >
-                &yen;{{ item.price }}&nbsp;x&nbsp;{{ item.count }}
+              <div class="wrapper_content_productlist_item_flex_sums">
+                &yen;{{ item.total }}
               </div>
-            </div>
-            <div class="wrapper_content_productlist_item_flex_sums">
-              &yen;{{ item.total }}
             </div>
           </div>
-        </div>
 
-        <!-- <div class="gouwuche_content_zongji">
+          <!-- <div class="gouwuche_content_zongji">
           <div class="gouwuche_content_zongji_total">
             <div class="gouwuche_content_zongji_total_num">
               共计{{ items.count }}件/
@@ -51,13 +62,14 @@
           </div>
           <div class="gouwuche_content_zongji_font">去结算</div>
         </div> -->
+        </div>
       </div>
-    </div>
 
-    <div class="wrapper_under">
-      <div class="wrapper_under_money">实付金额：&yen;{{ price }}</div>
-      <div class="wrapper_under_sub" @click="handleProductsSubmit">
-        提交订单
+      <div class="wrapper_under">
+        <div class="wrapper_under_money">实付金额：&yen;{{ price }}</div>
+        <div class="wrapper_under_sub" @click="handleProductsSubmit">
+          提交订单
+        </div>
       </div>
     </div>
   </div>
@@ -69,6 +81,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import request from "../../utils/request";
+import { ref } from "vue";
 
 const useProductListEffect = () => {
   const route = useRoute();
@@ -112,11 +125,16 @@ const useProductsConfirmSubmitEffect = () => {
   const route = useRoute();
   const router = useRouter();
 
+  const store = useStore();
+
   const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
   const DefaultAddressId = JSON.parse(localStorage.getItem("DefaultAddressId"));
   const shopId = Number(route.params.id);
   const shopName = route.query.plan;
   const products = JSON.parse(localStorage.getItem("products"));
+
+  // 弹窗
+  const showPopup = ref(false);
 
   const handleProductsSubmit = async () => {
     try {
@@ -128,14 +146,22 @@ const useProductsConfirmSubmitEffect = () => {
         products: JSON.stringify(products),
       });
       if (result.msg == "ok") {
-        router.push({ name: "OrderList" });
+        showPopup.value = !showPopup.value;
+        // 清空购物车
+        store.commit("clearCartProducts", { shopId });
       }
     } catch (e) {
       console.log("提交订单失败");
     }
   };
 
-  return { handleProductsSubmit };
+  // 关闭弹窗
+  const handleToastShutdown = () => {
+    showPopup.value = !showPopup.value;
+    router.push({ name: "OrderList" });
+  };
+
+  return { handleProductsSubmit, showPopup, handleToastShutdown };
 };
 
 // 返回按钮
@@ -157,7 +183,9 @@ export default {
     const shopTitle = route.query.plan;
     const { handleBackClick } = useBackRouterEffect();
     const { productItemTotoal, price } = useProductListEffect();
-    const { handleProductsSubmit } = useProductsConfirmSubmitEffect();
+    const { handleProductsSubmit, showPopup, handleToastShutdown } =
+      useProductsConfirmSubmitEffect();
+
     return {
       handleBackClick,
       shopTitle,
@@ -165,6 +193,8 @@ export default {
       price,
 
       handleProductsSubmit,
+      showPopup,
+      handleToastShutdown,
     };
   },
 };
@@ -172,6 +202,39 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../style/variables.scss";
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.5);
+  // z-index: 1;
+}
+.showPopup {
+  position: fixed;
+  width: 2.5rem;
+  height: 1.5rem;
+  left: 19%;
+  transform: translateX(2.5rem);
+  top: 50%;
+  transform: translateY(-1rem);
+  background: white;
+  border-radius: 0.1rem;
+  &_gg {
+    font-size: 0.3rem;
+    text-align: right;
+  }
+  &_rr {
+    font-size: 0.6rem;
+    text-align: center;
+    height: 50%;
+  }
+  &_font {
+    font-size: 0.2rem;
+    text-align: center;
+  }
+}
 .wrapper {
   overflow-y: auto;
   background: $search-bgColor;

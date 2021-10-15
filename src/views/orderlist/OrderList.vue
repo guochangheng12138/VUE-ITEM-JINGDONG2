@@ -2,20 +2,22 @@
   <div class="wrapper">
     <div class="wrapper_title">我的订单</div>
     <div
-      v-for="items in productListall"
+      v-for="items in userOrderLists"
       :key="items.id"
       v-show="items.count != 0"
       class="gouwuche_content"
     >
       <div class="gouwuche_content_font">
-        <div class="gouwuche_content_font_shoptitle">{{ items.title }}</div>
-        <div class="gouwuche_content_font_pay">未支付</div>
+        <div class="gouwuche_content_font_shoptitle">{{ items.shop_name }}</div>
+        <div class="gouwuche_content_font_pay" @click="handleOrderlistSubmit">
+          {{ items.order_status }}
+        </div>
       </div>
       <div class="gouwuche_content_item">
         <div class="gouwuche_content_item_bl">
           <div
             class="gouwuche_content_item_bl_li"
-            v-for="item in items.pId"
+            v-for="item in items.products"
             :key="item.id"
           >
             <img
@@ -27,9 +29,9 @@
         </div>
         <div class="gouwuche_content_item_cp">
           <div class="gouwuche_content_item_cp_price">
-            &yen;{{ items.counts }}
+            &yen;{{ items.totalprice }}
           </div>
-          <div class="gouwuche_content_item_cp_num">共{{ items.count }}件</div>
+          <div class="gouwuche_content_item_cp_num">共{{ items.total }}件</div>
         </div>
       </div>
     </div>
@@ -39,80 +41,88 @@
 
 <script>
 import Docker from "../home/Docker.vue";
-
-import { computed } from "vue";
-import { useStore } from "vuex";
+import { ref } from "vue";
 import request from "../../utils/request";
+// import { computed } from "vue";
+// import { useStore } from "vuex";
 
 // 本地购物车请求逻辑
-const useCartEffect = () => {
-  const store = useStore();
-  const cartList = store.state.cartList;
+// const useCartEffect = () => {
+//   const store = useStore();
+//   const cartList = store.state.cartList;
 
-  // 全部订单商品总价格
-  const productListall = computed(() => {
-    const productLists = cartList;
+//   // 全部订单商品总价格
+//   const productListall = computed(() => {
+//     const productLists = cartList;
 
-    if (productLists) {
-      for (let i in productLists) {
-        let count = 0;
-        let counts = 0;
-        const productList = productLists[i].pId;
-        for (let j in productList) {
-          const product = productList[j];
-          counts += product.count * product.price;
-          count += product.count;
-          product.total = product.count * product.price;
-        }
-        productLists[i].count = count;
-        productLists[i].counts = counts;
-      }
-    }
-    return productLists;
-  });
+//     if (productLists) {
+//       for (let i in productLists) {
+//         let count = 0;
+//         let counts = 0;
+//         const productList = productLists[i].pId;
+//         for (let j in productList) {
+//           const product = productList[j];
+//           counts += product.count * product.price;
+//           count += product.count;
+//           product.total = product.count * product.price;
+//         }
+//         productLists[i].count = count;
+//         productLists[i].counts = counts;
+//       }
+//     }
+//     return productLists;
+//   });
 
-  return {
-    productListall,
-  };
-};
+//   return {
+//     productListall,
+//   };
+// };
 
 // 用户在线订单请求逻辑
-// const userOrderList = ref({});
-const userOrderList = {};
 const usegetOrderListEffect = () => {
+  const userOrderLists = ref({});
   const getOrderList = async () => {
     const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
     const result = await request.get("/api/v1/orders/" + userinfo.id);
     if (result.msg == "ok") {
-      userOrderList.value = result.data;
-
-      console.log(result.data[1]);
-      console.log(userOrderList.value[1]);
-
-      console.log(userOrderList);
-      console.log(result.data);
-      console.log(typeof result.data);
-      console.log(result.data[1].products);
-      // console.log(typeof userOrderList);
-      // localStorage.setItem("useraddress", JSON.stringify(result.data));
+      userOrderLists.value = result.data;
+      for (let i in userOrderLists.value) {
+        const st = JSON.parse(userOrderLists.value[i].products);
+        userOrderLists.value[i].products = st;
+        let total = 0;
+        let totalprice = 0;
+        for (let j in userOrderLists.value[i].products) {
+          const Order = userOrderLists.value[i].products[j];
+          total += Order.count;
+          totalprice += Order.count * Order.price;
+        }
+        userOrderLists.value[i].total = total;
+        userOrderLists.value[i].totalprice = totalprice;
+      }
+      localStorage.setItem(
+        "userOrderLists",
+        JSON.stringify(userOrderLists.value)
+      );
     } else {
-      // localStorage.setItem("useraddress", {});
       console.log("订单不存在");
     }
   };
-  return { getOrderList };
+
+  return { getOrderList, userOrderLists };
 };
+// 未支付跳转逻辑
 
 export default {
   name: "OrderList",
   components: { Docker },
 
   setup() {
-    const { productListall } = useCartEffect();
-    const { getOrderList } = usegetOrderListEffect();
+    // const { productListall } = useCartEffect();
+    const { getOrderList, userOrderLists } = usegetOrderListEffect();
     getOrderList();
     return {
-      productListall,
+      // productListall,
+      userOrderLists,
     };
   },
 };
