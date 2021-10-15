@@ -2,14 +2,17 @@
   <div class="wrapper">
     <div class="wrapper_title">我的订单</div>
     <div
-      v-for="items in userOrderLists"
+      v-for="(items, index) in userOrderLists"
       :key="items.id"
       v-show="items.count != 0"
       class="gouwuche_content"
     >
       <div class="gouwuche_content_font">
         <div class="gouwuche_content_font_shoptitle">{{ items.shop_name }}</div>
-        <div class="gouwuche_content_font_pay" @click="handleOrderlistSubmit">
+        <div
+          class="gouwuche_content_font_pay"
+          @click="handleOrderlistSubmit(index)"
+        >
           {{ items.order_status }}
         </div>
       </div>
@@ -43,6 +46,7 @@
 import Docker from "../home/Docker.vue";
 import { ref } from "vue";
 import request from "../../utils/request";
+import { useRouter } from "vue-router";
 // import { computed } from "vue";
 // import { useStore } from "vuex";
 
@@ -111,6 +115,18 @@ const usegetOrderListEffect = () => {
   return { getOrderList, userOrderLists };
 };
 // 未支付跳转逻辑
+const userOrderListsSubmitEffect = () => {
+  const router = useRouter();
+  const handleOrderlistSubmit = (index) => {
+    router.push({
+      path: `/orderlistconfirm/${index}`,
+      // query: { plan: `${shopTitle}` },
+    });
+    // 设置进入订单确认界面，点击每个订单后的跳转校验参数
+    localStorage.OrderListsubmit = true;
+  };
+  return { handleOrderlistSubmit };
+};
 
 export default {
   name: "OrderList",
@@ -119,10 +135,12 @@ export default {
   setup() {
     // const { productListall } = useCartEffect();
     const { getOrderList, userOrderLists } = usegetOrderListEffect();
+    const { handleOrderlistSubmit } = userOrderListsSubmitEffect();
     getOrderList();
     return {
       // productListall,
       userOrderLists,
+      handleOrderlistSubmit,
     };
   },
 };

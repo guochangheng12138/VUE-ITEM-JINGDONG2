@@ -20,6 +20,7 @@
         class="gouwuche_content_item"
         v-for="item in items.pId"
         :key="item.id"
+        v-show="item.count != 0"
       >
         <img :src="item.img_url" alt="" class="gouwuche_content_item_img" />
         <div class="gouwuche_content_item_flex">

@@ -25,6 +25,7 @@
             class="wrapper_content_productlist_item"
             v-for="(item, index) in productItemTotoal"
             :key="index"
+            v-show="item.count != 0"
           >
             <img
               class="wrapper_content_productlist_item_img"
@@ -50,18 +51,6 @@
               </div>
             </div>
           </div>
-
-          <!-- <div class="gouwuche_content_zongji">
-          <div class="gouwuche_content_zongji_total">
-            <div class="gouwuche_content_zongji_total_num">
-              共计{{ items.count }}件/
-            </div>
-            <div class="gouwuche_content_zongji_total_price">
-              {{ items.counts }}元
-            </div>
-          </div>
-          <div class="gouwuche_content_zongji_font">去结算</div>
-        </div> -->
         </div>
       </div>
 
@@ -77,6 +66,7 @@
 
 <script>
 import AddressSelect from "./AddressSelect";
+
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { computed } from "vue";
@@ -89,6 +79,7 @@ const useProductListEffect = () => {
 
   const shopId = route.params.id;
   const cartList = store.state.cartList;
+  // const cartList = JSON.parse(localStorage.getItem("carList"));
 
   // 单个商品总价格
   const productItemTotoal = computed(() => {
