@@ -158,6 +158,11 @@ export default {
 <style lang="scss" scoped>
 @import "../../style/variables.scss";
 .wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0rem;
+  right: 0;
   overflow-y: auto;
   background: $search-bgColor;
   padding: 0.02rem;
@@ -176,7 +181,7 @@ export default {
   background: $bgColor;
   margin-left: 0.1rem;
   margin-right: 0.1rem;
-  padding-bottom: 0.1rem;
+  padding-bottom: 0.8rem;
   border-radius: 0.1rem;
   &_shoptitle {
     font-size: 0.2rem;

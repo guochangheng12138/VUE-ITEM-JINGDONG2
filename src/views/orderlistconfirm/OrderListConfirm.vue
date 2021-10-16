@@ -1,64 +1,65 @@
 <template>
   <div>
-    <div class="mask" v-if="showPopup"></div>
-    <div class="showPopup iconfont" v-if="showPopup">
-      <div class="showPopup_gg" @click="handleToastShutdown">&#xe604;</div>
-      <div class="showPopup_rr">&#xe62f;</div>
-      <div class="showPopup_font">支付成功,等待配送</div>
-    </div>
-    <div class="wrapper">
-      <div class="wrapper_title">
-        <div class="wrapper_title_icon iconfont" @click="handleBackClick">
-          &#xe612;
-        </div>
-        <div class="wrapper_title_font">确认订单</div>
+    <div>
+      <div class="mask" v-if="showPopup"></div>
+      <div class="showPopup iconfont" v-if="showPopup">
+        <div class="showPopup_gg" @click="handleToastShutdown">&#xe604;</div>
+        <div class="showPopup_rr">&#xe62f;</div>
+        <div class="showPopup_font">支付成功,等待配送</div>
       </div>
-      <div class="wrapper_content">
-        <AddressSelect />
-
-        <div class="wrapper_content_productlist">
-          <div class="wrapper_content_productlist_shoptitle">
-            {{ shopTitle }}
+      <div class="wrapper">
+        <div class="wrapper_title">
+          <div class="wrapper_title_icon iconfont" @click="handleBackClick">
+            &#xe612;
           </div>
+          <div class="wrapper_title_font">确认订单</div>
+        </div>
+        <div class="wrapper_content">
+          <AddressSelect />
 
-          <div
-            class="wrapper_content_productlist_item"
-            v-for="(item, index) in productlist.value"
-            :key="index"
-            v-show="item.count != 0"
-          >
-            <img
-              class="wrapper_content_productlist_item_img"
-              :src="item.img_url"
-            />
-            <div class="wrapper_content_productlist_item_flex">
-              <div class="wrapper_content_productlist_item_flex_name22price">
-                <div
-                  class="wrapper_content_productlist_item_flex_name22price_name"
-                >
-                  {{ item.name }}
+          <div class="wrapper_content_productlist">
+            <div class="wrapper_content_productlist_shoptitle">
+              {{ shopTitle }}
+            </div>
+
+            <div
+              class="wrapper_content_productlist_item"
+              v-for="(item, index) in productlist.value"
+              :key="index"
+              v-show="item.count != 0"
+            >
+              <img
+                class="wrapper_content_productlist_item_img"
+                :src="item.img_url"
+              />
+              <div class="wrapper_content_productlist_item_flex">
+                <div class="wrapper_content_productlist_item_flex_name22price">
+                  <div
+                    class="
+                      wrapper_content_productlist_item_flex_name22price_name
+                    "
+                  >
+                    {{ item.name }}
+                  </div>
+                  <div
+                    class="
+                      wrapper_content_productlist_item_flex_name22price_price
+                    "
+                  >
+                    &yen;{{ item.price }}&nbsp;x&nbsp;{{ item.count }}
+                  </div>
                 </div>
-                <div
-                  class="
-                    wrapper_content_productlist_item_flex_name22price_price
-                  "
-                >
-                  &yen;{{ item.price }}&nbsp;x&nbsp;{{ item.count }}
+                <div class="wrapper_content_productlist_item_flex_sums">
+                  &yen;{{ item.total }}
                 </div>
-              </div>
-              <div class="wrapper_content_productlist_item_flex_sums">
-                &yen;{{ item.total }}
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="wrapper_under">
-        <div class="wrapper_under_money">实付金额：&yen;{{ count }}</div>
-        <div class="wrapper_under_sub" @click="handleProductsSubmit">
-          提交订单
-        </div>
+      <div class="under">
+        <div class="money">实付金额：&yen;{{ count }}</div>
+        <div class="sub" @click="handleProductsSubmit">提交订单</div>
       </div>
     </div>
   </div>
@@ -264,10 +265,14 @@ export default {
   }
 }
 .wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0rem;
+  right: 0;
   overflow-y: auto;
   background: $search-bgColor;
   padding: 0.01rem;
-  height: 5.65rem;
   &_title {
     background: rgb(13, 45, 223);
     height: 1.7rem;
@@ -325,26 +330,29 @@ export default {
       }
     }
   }
-  &_under {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    font-size: 0.15rem;
-    line-height: 0.5rem;
-    border-top: solid rgb(200, 220, 236) 0.01rem;
-    height: 0.5rem;
-    &_money {
-      width: 70%;
-      padding-left: 0.2rem;
-    }
-    &_sub {
-      width: 30%;
-      color: white;
-      background: rgb(81, 5, 143);
-      text-align: center;
-    }
-  }
+}
+.under {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  font-size: 0.15rem;
+  line-height: 0.5rem;
+  border-top: solid rgb(200, 220, 236) 0.01rem;
+  height: 0.5rem;
+  background: white;
+  z-index: 55;
+}
+.money {
+  width: 70%;
+  padding-left: 0.2rem;
+}
+.sub {
+  width: 30%;
+  color: white;
+  background: rgb(81, 5, 143);
+  text-align: center;
+  border: solid;
 }
 </style>

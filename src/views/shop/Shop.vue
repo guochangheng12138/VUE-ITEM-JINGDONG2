@@ -88,6 +88,11 @@ export default {
 @import "@/style/variables.scss";
 .wrapper {
   padding: 0 0.18rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0rem;
+  right: 0;
 }
 .search {
   display: flex;

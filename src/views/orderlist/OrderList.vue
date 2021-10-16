@@ -5,36 +5,40 @@
       v-for="(items, index) in userOrderLists"
       :key="index"
       v-show="items.count != 0"
-      class="gouwuche_content"
+      class="wrapper_order_gouwuche_content"
     >
-      <div class="gouwuche_content_font">
-        <div class="gouwuche_content_font_shoptitle">{{ items.shop_name }}</div>
+      <div class="wrapper_order_gouwuche_content_font">
+        <div class="wrapper_order_gouwuche_content_font_shoptitle">
+          {{ items.shop_name }}
+        </div>
         <div
-          class="gouwuche_content_font_pay"
+          class="wrapper_order_gouwuche_content_font_pay"
           @click="handleOrderlistSubmit(items.shop_id, items.shop_name, index)"
         >
           {{ items.order_status }}
         </div>
       </div>
-      <div class="gouwuche_content_item">
-        <div class="gouwuche_content_item_bl">
+      <div class="wrapper_order_gouwuche_content_item">
+        <div class="wrapper_order_gouwuche_content_item_bl">
           <div
-            class="gouwuche_content_item_bl_li"
+            class="wrapper_order_gouwuche_content_item_bl_li"
             v-for="item in items.products"
             :key="item.id"
           >
             <img
               :src="item.img_url"
               alt=""
-              class="gouwuche_content_item_bl_li_img"
+              class="wrapper_order_gouwuche_content_item_bl_li_img"
             />
           </div>
         </div>
-        <div class="gouwuche_content_item_cp">
-          <div class="gouwuche_content_item_cp_price">
+        <div class="wrapper_order_gouwuche_content_item_cp">
+          <div class="wrapper_order_gouwuche_content_item_cp_price">
             &yen;{{ items.totalprice }}
           </div>
-          <div class="gouwuche_content_item_cp_num">共{{ items.total }}件</div>
+          <div class="wrapper_order_gouwuche_content_item_cp_num">
+            共{{ items.total }}件
+          </div>
         </div>
       </div>
     </div>
@@ -149,6 +153,11 @@ export default {
 <style lang="scss" scoped>
 @import "../../style/variables.scss";
 .wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0.5rem;
+  right: 0;
   overflow-y: auto;
   background: $search-bgColor;
   padding: 0.02rem;
@@ -160,53 +169,55 @@ export default {
     padding-bottom: 0.22rem;
     background: $bgColor;
   }
-}
-.gouwuche_content {
-  background: white;
-  width: 90%;
-  margin: 0.15rem auto 0.15rem;
-  border-radius: 0.1rem;
-  &_font {
-    display: flex;
-    padding-top: 0.2rem;
-    margin-bottom: 0.1rem;
-    font-size: 0.2rem;
-    &_shoptitle {
-      width: 80%;
-      margin-left: 0.1rem;
-    }
-    &_pay {
-      width: 20%;
-      color: $content-bgColor;
-      font-size: 0.17rem;
-    }
-  }
-  &_item {
-    display: flex;
-    &_bl {
-      display: flex;
-      width: 80%;
-      margin-left: 0.1rem;
-
-      &_li {
-        &_img {
-          width: 0.5rem;
-          height: 0.5rem;
-          margin-right: 0.1rem;
+  &_order {
+    &_gouwuche_content {
+      background: white;
+      width: 90%;
+      margin: 0.15rem auto 0.15rem;
+      border-radius: 0.1rem;
+      &_font {
+        display: flex;
+        padding-top: 0.2rem;
+        margin-bottom: 0.1rem;
+        font-size: 0.2rem;
+        &_shoptitle {
+          width: 80%;
+          margin-left: 0.1rem;
+        }
+        &_pay {
+          width: 20%;
+          color: $content-bgColor;
+          font-size: 0.17rem;
         }
       }
-    }
-    &_cp {
-      width: 20%;
-      margin-bottom: 0.2rem;
-      &_price {
-        color: $hightlight-fontColor;
-        margin-left: 0.1rem;
-        margin-bottom: 0.05rem;
-        font-size: 0.2rem;
-      }
-      &_num {
-        margin-left: 0.1rem;
+      &_item {
+        display: flex;
+        &_bl {
+          display: flex;
+          width: 80%;
+          margin-left: 0.1rem;
+
+          &_li {
+            &_img {
+              width: 0.5rem;
+              height: 0.5rem;
+              margin-right: 0.1rem;
+            }
+          }
+        }
+        &_cp {
+          width: 20%;
+          margin-bottom: 0.2rem;
+          &_price {
+            color: $hightlight-fontColor;
+            margin-left: 0.1rem;
+            margin-bottom: 0.05rem;
+            font-size: 0.2rem;
+          }
+          &_num {
+            margin-left: 0.1rem;
+          }
+        }
       }
     }
   }

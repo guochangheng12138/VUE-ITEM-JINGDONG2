@@ -37,14 +37,17 @@ export default {
 .docker {
   display: flex;
   box-sizing: border-box;
-  position: absolute;
   padding: 0 0.18rem;
+  position: absolute;
   left: 0;
   bottom: 0;
+  right: 0;
   width: 100%;
   height: 0.49rem;
   border-top: 0.01rem solid #f1f1f1;
   color: $content-fontColor;
+  background: white;
+  z-index: 55;
   &_item {
     flex: 1;
     text-align: center;
