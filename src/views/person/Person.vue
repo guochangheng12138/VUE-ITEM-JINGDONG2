@@ -133,8 +133,9 @@ export default {
   &_icon {
     position: absolute;
     margin-top: -1.8rem;
-    margin-left: 3.2rem;
+    font-size: 0.27rem;
     color: white;
+    right: 10%;
   }
   &_center {
     width: 90%;
@@ -202,7 +203,7 @@ export default {
         display: flex;
         height: 0.4rem;
         &_icon {
-          width: 8%;
+          width: 0.28rem;
           height: 0.28rem;
           border-radius: 50%;
           text-align: center;
@@ -220,7 +221,7 @@ export default {
           }
         }
         &_font {
-          width: 80%;
+          flex: 1;
           line-height: 0.4rem;
           padding-left: 00.08rem;
         }
@@ -228,6 +229,7 @@ export default {
           width: 5%;
           line-height: 0.4rem;
           color: $content-bgColor;
+          text-align: center;
         }
       }
     }

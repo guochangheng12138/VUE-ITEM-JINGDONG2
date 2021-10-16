@@ -69,10 +69,11 @@ export default {
 
 <style lang="scss" scoped>
 .wrappers {
+  position: absolute;
+  top: 1.4rem;
   width: 90%;
   border-radius: 0.1rem;
-  margin-left: 0.15rem;
-  margin-top: -0.6rem;
+  left: 5%;
   background-color: white;
   border: white;
   &_title {
@@ -80,7 +81,6 @@ export default {
     padding-top: 0.1rem;
     padding-left: 0.1rem;
     padding-bottom: 0.1rem;
-    width: 1rem;
     height: 0.25rem;
   }
   &_content {
@@ -88,10 +88,8 @@ export default {
     padding-left: 0.1rem;
     padding-bottom: 00.1rem;
     height: 0.5rem;
-    width: 3rem;
-
     &_address {
-      margin-bottom: 0.1rem;
+      padding-bottom: 0.1rem;
     }
     &_namemobile {
       margin-bottom: 0.1rem;

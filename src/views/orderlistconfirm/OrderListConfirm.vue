@@ -238,13 +238,14 @@ export default {
   bottom: 0;
   top: 0;
   background: rgba(0, 0, 0, 0.5);
-  // z-index: 1;
+  z-index: 199;
 }
 .showPopup {
+  z-index: 199;
   position: fixed;
-  width: 2.5rem;
+  width: 60%;
   height: 1.5rem;
-  left: 19%;
+  left: 20%;
   transform: translateX(2.5rem);
   top: 50%;
   transform: translateY(-1rem);
@@ -268,7 +269,7 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 0rem;
+  bottom: 0.5rem;
   right: 0;
   overflow-y: auto;
   background: $search-bgColor;
@@ -281,16 +282,17 @@ export default {
     color: white;
     padding-top: 0.2rem;
     &_icon {
+      position: absolute;
       font-size: 0.3rem;
     }
     &_font {
-      width: 80%;
+      width: 100%;
       text-align: center;
     }
   }
   &_content {
     &_productlist {
-      margin-top: 0.1rem;
+      margin-top: 0.75rem;
       font-size: 0.15rem;
       background: $bgColor;
       margin-left: 0.1rem;
@@ -305,6 +307,7 @@ export default {
       &_item {
         display: flex;
         padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+        width: 100％;
         &_img {
           width: 0.5rem;
           height: 0.5rem;
@@ -313,9 +316,10 @@ export default {
         &_flex {
           display: flex;
           font-size: 0.18rem;
+          flex: 1;
           &_name22price {
+            flex: 1;
             padding-right: 1.2rem;
-            width: 20%;
             &_name {
               margin-bottom: 0.1rem;
             }
@@ -325,6 +329,7 @@ export default {
           }
           &_sums {
             padding-top: 0.28rem;
+            text-align: right;
           }
         }
       }

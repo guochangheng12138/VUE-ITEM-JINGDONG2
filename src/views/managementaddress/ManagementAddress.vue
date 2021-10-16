@@ -204,7 +204,7 @@ export default {
     padding-top: 0.15rem;
     padding-bottom: 0.15rem;
     &_mes {
-      width: 85%;
+      flex: 1;
       &_nt {
         padding-left: 0.1rem;
         display: flex;
@@ -218,11 +218,12 @@ export default {
       }
     }
     &_go {
-      width: 15%;
+      width: 0.5rem;
+      padding-right: 0.1rem;
       &_delete {
         font-size: 0.2rem;
         margin-top: -0.1rem;
-        padding-left: 0.2rem;
+        padding-left: 0.25rem;
         height: 0.32rem;
       }
       &_in {

@@ -185,7 +185,9 @@ export default {
           margin-left: 0.1rem;
         }
         &_pay {
+          text-align: right;
           width: 20%;
+          padding-right: 00.1rem;
           color: $content-bgColor;
           font-size: 0.17rem;
         }
@@ -213,8 +215,12 @@ export default {
             margin-left: 0.1rem;
             margin-bottom: 0.05rem;
             font-size: 0.2rem;
+            text-align: right;
+            padding-right: 00.1rem;
           }
           &_num {
+            padding-right: 00.1rem;
+            text-align: right;
             margin-left: 0.1rem;
           }
         }

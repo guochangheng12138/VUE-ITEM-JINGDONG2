@@ -32,10 +32,8 @@
               &yen;{{ item.price }} x {{ item.count }}
             </div>
           </div>
-          <div class="gouwuche_content_item_flex_sums">
-            &yen;{{ item.total }}
-          </div>
         </div>
+        <div class="gouwuche_content_item_sums">&yen;{{ item.total }}</div>
       </div>
       <div class="gouwuche_content_zongji">
         <div class="gouwuche_content_zongji_total">
@@ -161,7 +159,7 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 0rem;
+  bottom: 0.5rem;
   right: 0;
   overflow-y: auto;
   background: $search-bgColor;
@@ -181,7 +179,7 @@ export default {
   background: $bgColor;
   margin-left: 0.1rem;
   margin-right: 0.1rem;
-  padding-bottom: 0.8rem;
+  padding-bottom: 0.1rem;
   border-radius: 0.1rem;
   &_shoptitle {
     font-size: 0.2rem;
@@ -195,26 +193,25 @@ export default {
     &_img {
       width: 0.5rem;
       height: 0.5rem;
-      margin-right: 0.35rem;
+      padding-right: 0.35rem;
     }
     &_flex {
       display: flex;
       font-size: 0.18rem;
       padding-bottom: 0.2rem;
+      flex-grow: 1;
       &_name22price {
-        width: 20%;
-        padding-right: 1.2rem;
         &_name {
           margin-bottom: 0.1rem;
         }
         &_price {
           color: $hightlight-fontColor;
-          width: 1rem;
         }
       }
-      &_sums {
-        padding-top: 0.28rem;
-      }
+    }
+    &_sums {
+      padding-top: 0.28rem;
+      width: 0.5rem;
     }
   }
   &_zongji {
@@ -223,8 +220,8 @@ export default {
     display: flex;
     &_total {
       display: flex;
-      width: 50%;
-      margin-left: 0.6rem;
+      flex: 1;
+      padding-left: 0.6rem;
       color: rgb(96, 96, 223);
     }
     &_font {

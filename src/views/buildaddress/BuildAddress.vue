@@ -144,6 +144,7 @@ export default {
   }
   &_content {
     margin: 0.15rem auto 0;
+    text-align: center;
     &_item {
       width: 95%;
       margin-bottom: 0.1rem;

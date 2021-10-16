@@ -171,10 +171,10 @@ export default {
       background: $bgColor;
       display: flex;
       width: 95%;
-      margin-bottom: 0.1rem;
-      margin-left: 0.05rem;
+      margin: 0 auto 0.1rem;
       height: 0.4rem;
       &_info {
+        padding-left: 0.1rem;
         font-size: 0.15rem;
         line-height: 0.4rem;
       }
