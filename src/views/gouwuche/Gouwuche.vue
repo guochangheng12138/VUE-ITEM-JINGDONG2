@@ -97,6 +97,7 @@ const useCartEffect = () => {
         productLists[i].counts = counts;
       }
     }
+
     return productLists;
   });
 
@@ -104,6 +105,7 @@ const useCartEffect = () => {
   const qsum = computed(() => {
     const productLists = cartList;
     let num = 0;
+
     if (productLists) {
       for (let i in productLists) {
         const productList = productLists[i];
@@ -116,6 +118,7 @@ const useCartEffect = () => {
         }
       }
     }
+
     return num;
     // 购物车订单数量,写法2-------------
     // return {num};

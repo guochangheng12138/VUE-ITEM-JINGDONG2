@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="wrapper_title">我的订单</div>
+    <div class="wrapper_title">我的订单({{ num }})</div>
     <div
       v-for="(items, index) in userOrderLists"
       :key="index"
@@ -89,6 +89,8 @@ import { useRouter } from "vue-router";
 // 用户在线订单请求逻辑
 const usegetOrderListEffect = () => {
   const userOrderLists = ref({});
+  const num = ref(0);
+
   const getOrderList = async () => {
     const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
     const result = await request.get("/api/v1/orders/" + userinfo.id);
@@ -97,6 +99,7 @@ const usegetOrderListEffect = () => {
       for (let i in userOrderLists.value) {
         const st = JSON.parse(userOrderLists.value[i].products);
         userOrderLists.value[i].products = st;
+        num.value += 1;
         let total = 0;
         let totalprice = 0;
         for (let j in userOrderLists.value[i].products) {
@@ -116,7 +119,7 @@ const usegetOrderListEffect = () => {
     }
   };
 
-  return { getOrderList, userOrderLists };
+  return { getOrderList, userOrderLists, num };
 };
 // 未支付跳转逻辑
 const userOrderListsSubmitEffect = () => {
@@ -137,13 +140,13 @@ export default {
   components: { Docker },
 
   setup() {
-    // const { productListall } = useCartEffect();
-    const { getOrderList, userOrderLists } = usegetOrderListEffect();
-    const { handleOrderlistSubmit } = userOrderListsSubmitEffect();
+    const { getOrderList, userOrderLists, num } = usegetOrderListEffect();
     getOrderList();
+    const { handleOrderlistSubmit } = userOrderListsSubmitEffect();
+
     return {
-      // productListall,
       userOrderLists,
+      num,
       handleOrderlistSubmit,
     };
   },
