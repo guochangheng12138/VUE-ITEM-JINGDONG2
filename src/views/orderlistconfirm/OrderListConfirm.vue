@@ -169,6 +169,7 @@ const useProductsConfirmSubmitEffect = () => {
         products: JSON.stringify(products),
       });
       if (result.msg == "ok") {
+		  console.log(result)
         showPopup.value = !showPopup.value;
         // 清空购物车
         store.commit("clearCartProducts", { shopId });
