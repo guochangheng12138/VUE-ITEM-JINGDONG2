@@ -130,7 +130,6 @@ const userOrderListsSubmitEffect = () => {
       query: { plan: `${shopTitle}`, index: `${index}` },
     });
     // 设置进入订单确认界面，点击每个订单后的跳转校验参数
-    localStorage.OrderListsubmit = true;
   };
   return { handleOrderlistSubmit };
 };

@@ -89,10 +89,7 @@
         <div class="check_info">
           总计：<span class="check_info_price">&yen;{{ price }}</span>
         </div>
-        <div
-          class="check_btn"
-          @click="handleOrderlistSubmit(shopId, shopTitle)"
-        >
+        <div class="check_btn" @click="handleProductsSubmit(shopId)">
           去结算
         </div>
         <!-- <router-link
@@ -118,10 +115,11 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 
 import { useCommonCartEffect } from "./CommonCartEffect";
+import request from "../../utils/request";
 
 // const useCartEffect = () => {
 const useCartEffect = (shopId) => {
-  const router = useRouter();
+  // const router = useRouter();
 
   const store = useStore();
   // const route = useRoute();
@@ -196,16 +194,6 @@ const useCartEffect = (shopId) => {
     store.commit("setCartItemsChecked", { shopId });
   };
 
-  // 结算跳转逻辑
-  const handleOrderlistSubmit = (shopId, shopTitle) => {
-    router.push({
-      path: `/orderlistconfirm/${shopId}`,
-      query: { plan: `${shopTitle}` },
-    });
-    // 设置进入订单确认界面前的跳转校验参数
-    localStorage.OrderListsubmit = false;
-  };
-
   // return { total, price };
   return {
     total,
@@ -220,8 +208,65 @@ const useCartEffect = (shopId) => {
     allChecked,
     setCartItemsChecked,
     // shopTitle,
-    handleOrderlistSubmit,
   };
+};
+
+// 结算提交订单并跳转逻辑
+const useProductsConfirmSubmitEffect = () => {
+  const router = useRouter();
+  const store = useStore();
+
+  const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
+  const DefaultAddressId = JSON.parse(localStorage.getItem("DefaultAddressId"));
+
+  const handleProductsSubmit = async (shopId) => {
+    if (localStorage.isDefaultAddress) {
+      const cartList = store.state.cartList;
+      const shopName = cartList[shopId].title;
+
+      const productlist = cartList[shopId].pId;
+      const products = []; // 订单提交商品列表
+      for (let i in productlist) {
+        const productIT = productlist[i];
+        // 订单商品列表
+        if (productIT.count !== 0) {
+          products.push({
+            id: parseInt(productIT.id, 10),
+            num: productIT.count,
+          });
+        }
+      }
+
+      try {
+        const result = await request.post("/api/v1/create/", {
+          id: userinfo.id,
+          addressId: DefaultAddressId,
+          shopId: shopId,
+          shopName: shopName,
+          products: JSON.stringify(products),
+        });
+        if (result.msg == "ok") {
+          console.log(result);
+          // 清空购物车
+          store.commit("clearCartProducts", { shopId });
+          // 跳转附带订单ID
+          const orderlistno = result.data.order_no;
+          router.push({
+            path: `/orderlistconfirm/${orderlistno}`,
+          });
+        }
+      } catch (e) {
+        console.log("提交订单失败");
+      }
+    } else {
+      router.push({
+        name: "ManagementAddress",
+      });
+      localStorage.AddressSelect = false;
+    }
+  };
+
+  return { handleProductsSubmit };
 };
 
 // 展示隐藏购物车逻辑
@@ -254,9 +299,9 @@ export default {
 
       allChecked,
       setCartItemsChecked,
-
-      handleOrderlistSubmit,
     } = useCartEffect(shopId);
+
+    const { handleProductsSubmit } = useProductsConfirmSubmitEffect();
 
     const { showCart, handleCartShowChange } = toggleCartEffect();
 
@@ -274,7 +319,7 @@ export default {
       allChecked,
       setCartItemsChecked,
 
-      handleOrderlistSubmit,
+      handleProductsSubmit,
 
       showCart,
       handleCartShowChange,

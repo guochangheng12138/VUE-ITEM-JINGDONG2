@@ -55,7 +55,7 @@
         </router-link> -->
         <div
           class="gouwuche_content_zongji_font"
-          @click="handleOrderlistSubmit(index, items.title)"
+          @click="handleProductsSubmit(index, items.title)"
         >
           去结算
         </div>
@@ -69,12 +69,11 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import request from "../../utils/request";
 
 import Docker from "../home/Docker.vue";
 
 const useCartEffect = () => {
-  const router = useRouter();
-
   const store = useStore();
   const cartList = store.state.cartList;
 
@@ -124,21 +123,69 @@ const useCartEffect = () => {
     // return {num};
     // 此处返回带{}的num,渲染层数据使用{{qsum.num}},返回多个数据必须用打点
   });
-  // 结算跳转逻辑
-  const handleOrderlistSubmit = (index, shopTitle) => {
-    router.push({
-      path: `/orderlistconfirm/${index}`,
-      query: { plan: `${shopTitle}` },
-    });
-    // 设置进入订单确认界面前的跳转校验参数
-    localStorage.OrderListsubmit = false;
-  };
 
   return {
     productListall,
     qsum,
-    handleOrderlistSubmit,
   };
+};
+
+// 结算提交订单并跳转逻辑
+const useProductsConfirmSubmitEffect = () => {
+  const router = useRouter();
+  const store = useStore();
+
+  const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
+  const DefaultAddressId = JSON.parse(localStorage.getItem("DefaultAddressId"));
+
+  const handleProductsSubmit = async (shopId) => {
+    if (localStorage.isDefaultAddress) {
+      const cartList = store.state.cartList;
+      const shopName = cartList[shopId].title;
+
+      const productlist = cartList[shopId].pId;
+      const products = []; // 订单提交商品列表
+      for (let i in productlist) {
+        const productIT = productlist[i];
+        // 订单商品列表
+        if (productIT.count !== 0) {
+          products.push({
+            id: parseInt(productIT.id, 10),
+            num: productIT.count,
+          });
+        }
+      }
+
+      try {
+        const result = await request.post("/api/v1/create/", {
+          id: userinfo.id,
+          addressId: DefaultAddressId,
+          shopId: shopId,
+          shopName: shopName,
+          products: JSON.stringify(products),
+        });
+        if (result.msg == "ok") {
+          console.log(result);
+          // 清空购物车
+          store.commit("clearCartProducts", { shopId });
+          // 跳转附带订单ID
+          const orderlistno = result.data.order_no;
+          router.push({
+            path: `/orderlistconfirm/${orderlistno}`,
+          });
+        }
+      } catch (e) {
+        console.log("提交订单失败");
+      }
+    } else {
+      router.push({
+        name: "ManagementAddress",
+      });
+      localStorage.AddressSelect = false;
+    }
+  };
+
+  return { handleProductsSubmit };
 };
 
 export default {
@@ -146,11 +193,12 @@ export default {
   components: { Docker },
 
   setup() {
-    const { productListall, qsum, handleOrderlistSubmit } = useCartEffect();
+    const { productListall, qsum } = useCartEffect();
+    const { handleProductsSubmit } = useProductsConfirmSubmitEffect();
     return {
       productListall,
       qsum,
-      handleOrderlistSubmit,
+      handleProductsSubmit,
     };
   },
 };
