@@ -81,10 +81,6 @@ const usegetOrderListEffect = () => {
         userOrderLists.value[i].total = total;
         userOrderLists.value[i].totalprice = totalprice;
       }
-      localStorage.setItem(
-        "userOrderLists",
-        JSON.stringify(userOrderLists.value)
-      );
     } else {
       console.log("订单不存在");
     }
