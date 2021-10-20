@@ -9,11 +9,14 @@
     >
       <div class="wrapper_order_gouwuche_content_font">
         <div class="wrapper_order_gouwuche_content_font_shoptitle">
-          {{ items.shop_name }}
+          <div>{{ items.shop_name }}</div>
+          <div class="wrapper_order_gouwuche_content_font_shoptitle_num">
+            订单号:{{ items.order_no }}
+          </div>
         </div>
         <div
           class="wrapper_order_gouwuche_content_font_pay"
-          @click="handleOrderlistSubmit(items.shop_id, items.shop_name, index)"
+          @click="handleOrderlistSubmit(items.order_no)"
         >
           {{ items.order_status }}
         </div>
@@ -54,38 +57,6 @@ import { useRouter } from "vue-router";
 // import { computed } from "vue";
 // import { useStore } from "vuex";
 
-// 本地购物车请求逻辑
-// const useCartEffect = () => {
-//   const store = useStore();
-//   const cartList = store.state.cartList;
-
-//   // 全部订单商品总价格
-//   const productListall = computed(() => {
-//     const productLists = cartList;
-
-//     if (productLists) {
-//       for (let i in productLists) {
-//         let count = 0;
-//         let counts = 0;
-//         const productList = productLists[i].pId;
-//         for (let j in productList) {
-//           const product = productList[j];
-//           counts += product.count * product.price;
-//           count += product.count;
-//           product.total = product.count * product.price;
-//         }
-//         productLists[i].count = count;
-//         productLists[i].counts = counts;
-//       }
-//     }
-//     return productLists;
-//   });
-
-//   return {
-//     productListall,
-//   };
-// };
-
 // 用户在线订单请求逻辑
 const usegetOrderListEffect = () => {
   const userOrderLists = ref({});
@@ -124,10 +95,9 @@ const usegetOrderListEffect = () => {
 // 未支付跳转逻辑
 const userOrderListsSubmitEffect = () => {
   const router = useRouter();
-  const handleOrderlistSubmit = (shopId, shopTitle, index) => {
+  const handleOrderlistSubmit = (order_no) => {
     router.push({
-      path: `/orderlistconfirm/${shopId}`,
-      query: { plan: `${shopTitle}`, index: `${index}` },
+      path: `/orderlistconfirm/${order_no}`,
     });
     // 设置进入订单确认界面，点击每个订单后的跳转校验参数
   };
@@ -185,6 +155,13 @@ export default {
         &_shoptitle {
           width: 80%;
           margin-left: 0.1rem;
+          display: flex;
+          &_num {
+            margin-left: 0.2rem;
+            font-size: 0.1rem;
+            line-height: 0.3rem;
+            color: red;
+          }
         }
         &_pay {
           text-align: right;
@@ -200,7 +177,6 @@ export default {
           display: flex;
           width: 80%;
           margin-left: 0.1rem;
-
           &_li {
             &_img {
               width: 0.5rem;

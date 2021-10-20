@@ -165,7 +165,6 @@ const useProductsConfirmSubmitEffect = () => {
           products: JSON.stringify(products),
         });
         if (result.msg == "ok") {
-          console.log(result);
           // 清空购物车
           store.commit("clearCartProducts", { shopId });
           // 跳转附带订单ID

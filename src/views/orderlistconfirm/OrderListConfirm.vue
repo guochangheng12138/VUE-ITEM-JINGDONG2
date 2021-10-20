@@ -19,12 +19,15 @@
 
           <div class="wrapper_content_productlist">
             <div class="wrapper_content_productlist_shoptitle">
-              {{ shopTitle }}
+              {{ OrderList.shop_name }}
+              <div class="wrapper_content_productlist_shoptitle_orderno">
+                订单号:{{ OrderList.order_no }}
+              </div>
             </div>
 
             <div
               class="wrapper_content_productlist_item"
-              v-for="(item, index) in productlist.value"
+              v-for="(item, index) in OrderList.products"
               :key="index"
               v-show="item.count != 0"
             >
@@ -50,7 +53,7 @@
                   </div>
                 </div>
                 <div class="wrapper_content_productlist_item_flex_sums">
-                  &yen;{{ item.total }}
+                  &yen;{{ item.counts }}
                 </div>
               </div>
             </div>
@@ -58,7 +61,7 @@
         </div>
       </div>
       <div class="under">
-        <div class="money">实付金额：&yen;{{ count }}</div>
+        <div class="money">实付金额：&yen;{{ OrderList.totalprice }}</div>
         <div class="sub" @click="handleProductsSubmit">提交订单</div>
       </div>
     </div>
@@ -69,114 +72,52 @@
 import AddressSelect from "./AddressSelect";
 
 import { useRoute, useRouter } from "vue-router";
-import { useStore } from "vuex";
 import request from "../../utils/request";
 import { ref } from "vue";
 
-const useProductListEffect = () => {
+// 订单请求逻辑
+const usegetOrderListEffect = () => {
   const route = useRoute();
-  const shopId = route.params.id;
+  const order_Id = route.params.id;
+  const OrderList = ref({});
 
-  const cartList = JSON.parse(localStorage.getItem("carList"));
-  const OrderList = JSON.parse(localStorage.getItem("userOrderLists"));
+  const getOrderList = async () => {
+    const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
+    const result = await request.get("/api/v1/order/" + userinfo.id, {
+      order_no: `${order_Id}`,
+    });
+    if (result.msg == "ok") {
+      OrderList.value = result.data;
+      // 转化字符串
+      const st = JSON.parse(OrderList.value.products);
+      OrderList.value.products = st;
 
-  // 单个商品总价格
-  const productlist = {};
-  const productItemTotoal = () => {
-    if (localStorage.OrderListsubmit !== "true") {
-      productlist.value = cartList[shopId].pId;
-      if (productlist.value) {
-        const products = []; // 订单商品列表
-        for (let i in productlist.value) {
-          const productIT = productlist.value[i];
-          productIT.total = productIT.count * productIT.price;
-          // 订单商品列表
-          if (productIT.count !== 0) {
-            products.push({
-              id: parseInt(productIT.id, 10),
-              num: productIT.count,
-            });
-          }
-        }
-        localStorage.products = JSON.stringify(products);
+      let total = 0;
+      let totalprice = 0;
+      for (let i in OrderList.value.products) {
+        // 计算
+        const Order = OrderList.value.products[i];
+        Order.counts = Order.count * Order.price;
+        total += Order.count;
+        totalprice += Order.count * Order.price;
       }
+      OrderList.value.total = total;
+      OrderList.value.totalprice = totalprice;
     } else {
-      const index = route.query.index;
-      productlist.value = OrderList[index].products;
-      if (productlist.value) {
-        const products = []; // 订单商品列表
-        for (let i in productlist.value) {
-          const productIT = productlist.value[i];
-          productIT.total = productIT.count * productIT.price;
-          // 订单商品列表
-          products.push({
-            id: parseInt(productIT.id, 10),
-            num: productIT.count,
-          });
-        }
-        localStorage.products = JSON.stringify(products);
-      }
-    }
-  };
-  // 全部订单商品总价格
-  let count = ref(0);
-  const price = () => {
-    if (localStorage.OrderListsubmit !== "true") {
-      productlist.value = cartList[shopId].pId;
-      if (productlist.value) {
-        for (let i in productlist.value) {
-          const product = productlist.value[i];
-          count.value += product.count * product.price;
-        }
-      }
-    } else {
-      const index = route.query.index;
-      productlist.value = OrderList[index].products;
-      if (productlist.value) {
-        for (let i in productlist.value) {
-          const product = productlist.value[i];
-          count.value += product.count * product.price;
-        }
-      }
+      console.log("订单不存在");
     }
   };
 
-  return { productItemTotoal, productlist, price, count };
+  return { getOrderList, OrderList };
 };
+
 // 订单提交逻辑
 const useProductsConfirmSubmitEffect = () => {
-  const route = useRoute();
   const router = useRouter();
-
-  const store = useStore();
-
-  const userinfo = JSON.parse(localStorage.getItem("userinfo")) || {};
-  const DefaultAddressId = JSON.parse(localStorage.getItem("DefaultAddressId"));
-  const shopId = Number(route.params.id);
-  const shopName = route.query.plan;
-  const products = JSON.parse(localStorage.getItem("products"));
-
   // 弹窗
   const showPopup = ref(false);
-
   const handleProductsSubmit = async () => {
-    try {
-      const result = await request.post("/api/v1/create/", {
-        id: userinfo.id,
-        addressId: DefaultAddressId,
-        shopId: shopId,
-        shopName: shopName,
-        products: JSON.stringify(products),
-      });
-      if (result.msg == "ok") {
-		  console.log(result)
-        showPopup.value = !showPopup.value;
-        // 清空购物车
-        store.commit("clearCartProducts", { shopId });
-      }
-    } catch (e) {
-      console.log("提交订单失败");
-    }
+    showPopup.value = !showPopup.value;
   };
 
   // 关闭弹窗
@@ -203,24 +144,19 @@ export default {
     AddressSelect,
   },
   setup() {
-    const route = useRoute();
-    const shopTitle = route.query.plan;
-
     const { handleBackClick } = useBackRouterEffect();
-    const { productItemTotoal, price, productlist, count } =
-      useProductListEffect();
-    productItemTotoal();
-    price();
+
+    const { getOrderList, OrderList } = usegetOrderListEffect();
+    getOrderList();
+
     const { handleProductsSubmit, showPopup, handleToastShutdown } =
       useProductsConfirmSubmitEffect();
 
     return {
       handleBackClick,
-      shopTitle,
-      productItemTotoal,
-      productlist,
-      price,
-      count,
+
+      getOrderList,
+      OrderList,
 
       handleProductsSubmit,
       showPopup,
@@ -304,6 +240,14 @@ export default {
         padding-top: 0.1rem;
         padding-left: 0.1rem;
         padding-bottom: 0.05rem;
+        &_orderno {
+          font-size: 0.15rem;
+          text-align: right;
+          width: 100%;
+          top: -0.23rem;
+          position: relative;
+          color: red;
+        }
       }
       &_item {
         display: flex;
