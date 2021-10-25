@@ -55,7 +55,7 @@
         </router-link> -->
         <div
           class="gouwuche_content_zongji_font"
-          @click="handleProductsSubmit(index, items.title)"
+          @click="handleProductsSubmit(index)"
         >
           去结算
         </div>
